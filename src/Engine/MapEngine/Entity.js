@@ -379,19 +379,19 @@ define(function( require )
 			return;
 		}
 
+		type = ChatBox.TYPE.PUBLIC;
 		entity = EntityManager.get(pkt.GID);
+
 		if (entity) {
 			entity.dialog.set( pkt.msg );
-		}
 
-		type = ChatBox.TYPE.PUBLIC;
-
-		// Should not happened
-		if (entity === Session.Entity) {
-			type |= ChatBox.TYPE.SELF;
-		}
-		else if (entity.isAdmin) {
-			type |= ChatBox.TYPE.ADMIN;
+			// Should not happen
+			if (entity === Session.Entity) {
+				type |= ChatBox.TYPE.SELF;
+			}
+			else if (entity.isAdmin) {
+				type |= ChatBox.TYPE.ADMIN;
+			}
 		}
 
 		ChatBox.addText( pkt.msg, type );
@@ -399,26 +399,20 @@ define(function( require )
 
 
 	/**
-	 * Entity say something in color
+	 * Entity say something in color (channel system)
 	 *
 	 * @param {object} pkt - PACKET.ZC.NPC_CHAT
 	 */
 	function onEntityTalkColor( pkt )
 	{
-		var entity;
 		var color = 'rgb(' + ([
 			( pkt.color & 0x000000ff ),
 			( pkt.color & 0x0000ff00 ) >> 8,
 			( pkt.color & 0x00ff0000 ) >> 16
 		]).join(',') + ')'; // bgr to rgb.
 
-		// Remove "pseudo : |00Dialogue
+		// Remove "pseudo : |00Dialogue"
 		pkt.msg = pkt.msg.replace(/\: \|\d{2}/, ': ');
-
-		entity = EntityManager.get(pkt.accountID);
-		if (entity) {
-			entity.dialog.set( pkt.msg );
-		}
 
 		ChatBox.addText( pkt.msg, ChatBox.TYPE.PUBLIC, color);
 	}
@@ -980,6 +974,12 @@ define(function( require )
 		Network.hookPacket( PACKET.ZC.NOTIFY_STANDENTRY7,           onEntitySpam );
 		Network.hookPacket( PACKET.ZC.NOTIFY_NEWENTRY7,             onEntitySpam );
 		Network.hookPacket( PACKET.ZC.NOTIFY_MOVEENTRY7,            onEntitySpam );
+		Network.hookPacket( PACKET.ZC.NOTIFY_STANDENTRY8,           onEntitySpam );
+		Network.hookPacket( PACKET.ZC.NOTIFY_NEWENTRY8,             onEntitySpam );
+		Network.hookPacket( PACKET.ZC.NOTIFY_MOVEENTRY8,            onEntitySpam );
+		Network.hookPacket( PACKET.ZC.NOTIFY_STANDENTRY9,           onEntitySpam );
+		Network.hookPacket( PACKET.ZC.NOTIFY_NEWENTRY9,             onEntitySpam );
+		Network.hookPacket( PACKET.ZC.NOTIFY_MOVEENTRY9,            onEntitySpam );
 		Network.hookPacket( PACKET.ZC.NOTIFY_VANISH,                onEntityVanish );
 		Network.hookPacket( PACKET.ZC.NOTIFY_MOVE,                  onEntityMove );
 		Network.hookPacket( PACKET.ZC.STOPMOVE,                     onEntityStopMove );
